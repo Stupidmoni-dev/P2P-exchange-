@@ -1,5 +1,3 @@
-Here's the corrected and complete code for your Telegram bot:
-
 ```javascript
 const TelegramBot = require('node-telegram-bot-api');
 const axios = require('axios');
