@@ -1,8 +1,11 @@
+Here's the corrected and complete code for your Telegram bot:
+
+```javascript
 const TelegramBot = require('node-telegram-bot-api');
 const axios = require('axios');
 
-// Replace with your Telegram Bot Token directly
-const token = 'Token'; // Replace with your actual token
+// Replace with your Telegram Bot Token
+const token = 'YOUR_BOT_TOKEN'; // Insert your bot token here
 
 // Create bot instance
 const bot = new TelegramBot(token, { polling: true });
@@ -27,14 +30,13 @@ const getPrices = async () => {
     }
 };
 
-// Welcome message (Fixed)
+// Welcome message
 bot.onText(/\/start/, async (msg) => {
     const chatId = msg.chat.id;
     const userName = msg.from.first_name;
 
     console.log(`Received /start command from: ${userName}`);
 
-    // Store user information in database if it's a new user
     if (!users[chatId]) {
         users[chatId] = { name: userName, kyc: false, history: [] };
     }
@@ -199,3 +201,6 @@ const matchTrades = () => {
 
 // Run the matching process every 30 seconds
 setInterval(matchTrades, 30000);
+```
+
+Replace `'YOUR_BOT_TOKEN'` with your actual bot token.
