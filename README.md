@@ -62,5 +62,3 @@ If you are serious about developing such a system or want to discuss collaborati
 This project is open-source and provided as a demo. Feel free to fork, modify, and extend the bot for your own use. However, please ensure to respect the project's purpose and do not use it for any illegal activities.
 
 ---
-
-This `README.md` should provide clear instructions and the necessary context about the project and how to connect with you. Let me know if you want to add or change anything!
