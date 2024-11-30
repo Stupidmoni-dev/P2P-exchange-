@@ -2,7 +2,7 @@ const TelegramBot = require('node-telegram-bot-api');
 const axios = require('axios');
 
 // Replace with your Telegram Bot Token directly
-const token = '7680051999:AAEcz8gpil8bzXNXPdShDUlukus0oqXIdyY'; // Replace with your actual token
+const token = 'Token'; // Replace with your actual token
 
 // Create bot instance
 const bot = new TelegramBot(token, { polling: true });
