@@ -1,8 +1,9 @@
 const TelegramBot = require('node-telegram-bot-api');
 const axios = require('axios');
+require('dotenv').config();
 
 // Replace with your Telegram Bot Token
-const token = '7680051999:AAFoJugHaGH-ALQvcUwuZJm5XoF3yQvA_mc';
+const token = process.env.BOT_TOKEN;
 
 // Create bot instance
 const bot = new TelegramBot(token, { polling: true });
@@ -10,7 +11,6 @@ const bot = new TelegramBot(token, { polling: true });
 // Database simulation (In-memory storage for simplicity)
 let users = {};
 let trades = [];
-let kycStatus = {};
 
 // Fetch crypto prices from CoinGecko API
 const getPrices = async () => {
@@ -46,9 +46,9 @@ bot.onText(/\/help/, (msg) => {
     Available Commands:
     /prices - View current cryptocurrency prices.
     /trade - Start a trade (Buy/Sell).
-    /kyc - View or complete KYC.
     /history - View your trade history.
     /support - Reach out to our developer for help or issues.
+    /donate - Donate to support the server running costs and the project.
     `;
 
     bot.sendMessage(chatId, helpMessage);
@@ -155,29 +155,22 @@ bot.onText(/\/sell (\w+) (\d+(\.\d+)?)/, async (msg, match) => {
     }
 });
 
-// Process KYC command
-bot.onText(/\/kyc/, (msg) => {
+// Donate command
+bot.onText(/\/donate/, (msg) => {
     const chatId = msg.chat.id;
+    const donateMessage = `
+    Thank you for considering a donation to support our server and development costs!
 
-    if (!users[chatId].kyc) {
-        bot.sendMessage(chatId, 'Please provide your KYC information in one message (e.g., Name, ID, Address, etc.).');
-    } else {
-        bot.sendMessage(chatId, 'Your KYC is already complete. You can now proceed.');
-    }
-});
+    Here are the wallet addresses for donations:
 
-// Handle KYC submission and forward to @tanzahostbot
-bot.on('message', (msg) => {
-    const chatId = msg.chat.id;
-    
-    if (msg.text && !users[chatId].kyc && !msg.text.startsWith('/')) {
-        const kycData = msg.text;
-        users[chatId].kyc = true;
-        bot.sendMessage(chatId, 'Thank you for submitting your KYC! You can now proceed with your trades.');
+    - **Bitcoin (BTC):** bc1q2zl77rcdqp8kj0yq6z8lvmvccvrq8zuthy7vrl
+    - **Ethereum (ETH):** 0xd94a42E6cccA40Fea53Da371057479373F200d38
+    - **Solana (SOL):** Fsf1YWcYCrKhkEkb5W6MeSm2yQiGfXM6qdasjjfLhqeY
 
-        // Forward KYC data to @tanzahostbot
-        bot.forwardMessage(7365008829, chatId, msg.message_id);
-    }
+    Any amount is appreciated and will help keep this project running smoothly. Thank you for your support!
+    `;
+
+    bot.sendMessage(chatId, donateMessage);
 });
 
 // Match buyers and sellers (escrow service)
@@ -185,31 +178,19 @@ const matchTrades = () => {
     for (let trade of trades) {
         if (trade.status === 'pending') {
             const oppositeType = trade.type === 'buy' ? 'sell' : 'buy';
-            const oppositeTrade = trades.find(t => t.type === oppositeType && t.status === 'pending' && t.crypto === trade.crypto && Math.abs(t.amount - trade.amount) < 0.01);
+            const oppositeTrade = trades.find(t => t.type === oppositeType && t.status === 'pending' && t.crypto === trade.crypto && Math.abs(t.amount - trade.amount) < 0.1);
 
             if (oppositeTrade) {
-                // Match buyer and seller
-                trade.status = 'matched';
-                oppositeTrade.status = 'matched';
-                bot.sendMessage(trade.userId, `Your ${trade.type} order for ${trade.amount.toFixed(2)} ${trade.crypto} has been matched with a ${oppositeTrade.type} order. The trade is now in progress.`);
-                bot.sendMessage(oppositeTrade.userId, `Your ${oppositeTrade.type} order for ${oppositeTrade.amount.toFixed(2)} ${oppositeTrade.crypto} has been matched with a ${trade.type} order. The trade is now in progress.`);
+                trade.status = 'completed';
+                oppositeTrade.status = 'completed';
+
+                bot.sendMessage(trade.userId, `Your ${trade.type} order for ${trade.amount} ${trade.crypto} has been matched with a ${oppositeTrade.type} order.`);
+                bot.sendMessage(oppositeTrade.userId, `Your ${oppositeTrade.type} order for ${oppositeTrade.amount} ${oppositeTrade.crypto} has been matched with a ${trade.type} order.`);
             }
         }
     }
 };
 
-// Set an interval to check for matching trades every 30 seconds
+// Run the matching process every 30 seconds
 setInterval(matchTrades, 30000);
 
-// New /support command for debugging or user assistance
-bot.onText(/\/support/, (msg) => {
-    const chatId = msg.chat.id;
-    const supportMessage = `
-    Need help or facing an issue? Reach out to our developer for assistance:
-    - Developer Contact: @stupidmoni
-    You can also report bugs or ask for help with your trades or KYC process.
-    We're here to assist you!
-    `;
-
-    bot.sendMessage(chatId, supportMessage);
-});
