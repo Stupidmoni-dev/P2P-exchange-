@@ -8,6 +8,11 @@ const token = process.env.BOT_TOKEN;
 // Create bot instance
 const bot = new TelegramBot(token, { polling: true });
 
+// Log any polling errors
+bot.on('polling_error', (error) => {
+    console.error('Polling error:', error);
+});
+
 // Database simulation (In-memory storage for simplicity)
 let users = {};
 let trades = [];
@@ -23,12 +28,14 @@ const getPrices = async () => {
     }
 };
 
-// Welcome message
+// Welcome message (Fixed)
 bot.onText(/\/start/, async (msg) => {
     const chatId = msg.chat.id;
     const userName = msg.from.first_name;
 
-    // Store user information in database
+    console.log(`Received /start command from: ${userName}`);
+
+    // Store user information in database if it's a new user
     if (!users[chatId]) {
         users[chatId] = { name: userName, kyc: false, history: [] };
     }
@@ -193,4 +200,3 @@ const matchTrades = () => {
 
 // Run the matching process every 30 seconds
 setInterval(matchTrades, 30000);
-
