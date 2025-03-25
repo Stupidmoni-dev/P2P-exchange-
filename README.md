@@ -52,7 +52,7 @@ Try out the [P2P Crypto Exchange Bot](https://t.me/P2P_CryptBot) on Telegram to 
 
 Interested in building a similar project or want to collaborate? Contact the developer:
 
-- **Telegram**: [@stupidmoni](https://t.me/stupidmoni)
+- **Telegram**: [@MoonDevOnSol](https://t.me/MoonDevOnSol)
 
 > **Note**: Only serious inquiries are entertained. Please avoid non-serious messages or trivial questions.
 
